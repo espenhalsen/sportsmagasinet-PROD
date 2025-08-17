@@ -7,33 +7,43 @@ if (!admin.apps.length) {
   // Use environment variables for production, fall back to service account file
   let credential;
 
-  // Preferred: one env var with the whole JSON (string or base64)
-  const SA_JSON = process.env.FIREBASE_SERVICE_ACCOUNT;           // plain JSON string
-  const SA_B64  = process.env.FIREBASE_SERVICE_ACCOUNT_B64;       // base64 of the JSON
+  // Use service account JSON string from environment variable
+  const SA_JSON = process.env.FIREBASE_SERVICE_ACCOUNT;
 
-  if (SA_JSON || SA_B64) {
-    // Use encrypted env variable(s) (production)
+  if (SA_JSON) {
+    // Use service account JSON (production)
+    let jsonStr;
     try {
-      let jsonStr = SA_JSON ?? Buffer.from(SA_B64, 'base64').toString('utf8');
-      
-      // Sanitize the JSON string to handle control characters
-      jsonStr = jsonStr
-        .replace(/\r\n/g, '\\n')  // Replace CRLF with escaped newline
-        .replace(/\r/g, '\\n')    // Replace CR with escaped newline
-        .replace(/\n/g, '\\n')    // Replace LF with escaped newline
-        .replace(/\t/g, '\\t')    // Replace tabs with escaped tabs
-        .trim();                  // Remove leading/trailing whitespace
+      // Handle multiline JSON in .env files by replacing literal newlines with escaped ones
+      jsonStr = SA_JSON
+        .replace(/\r?\n/g, '\\n')  // Replace actual newlines with \n
+        .replace(/\t/g, '\\t')     // Replace tabs with \t
+        .trim();
       
       const serviceAccount = JSON.parse(jsonStr);
 
-      // Handle escaped newlines in private_key if present
-      if (serviceAccount.private_key) {
+      // Validate required fields
+      if (!serviceAccount.private_key || !serviceAccount.client_email || !serviceAccount.project_id) {
+        throw new Error('Missing required fields in service account JSON');
+      }
+
+      // Convert escaped newlines back to actual newlines in private_key
+      if (serviceAccount.private_key.includes('\\n')) {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+      }
+
+      // Ensure private_key is properly formatted
+      if (!serviceAccount.private_key.includes('-----BEGIN PRIVATE KEY-----')) {
+        throw new Error('Invalid private key format: Missing PEM headers');
       }
 
       credential = admin.credential.cert(serviceAccount);
     } catch (error) {
       console.error('Failed to parse Firebase service account JSON:', error);
+      if (jsonStr) {
+        console.error('JSON string length:', jsonStr.length);
+        console.error('First 200 chars of JSON:', jsonStr.substring(0, 200));
+      }
       throw new Error('Firebase Admin SDK initialization failed: Invalid service account JSON');
     }
   } else if (

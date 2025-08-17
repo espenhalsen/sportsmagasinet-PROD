@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read access to articles for everyone
+    match /articles/{article} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.role == 'platform_admin';
+    }
+    
+    // User management
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || request.auth.token.role in ['platform_admin', 'agent', 'club_admin']);
+      allow write: if request.auth != null && (request.auth.uid == userId || request.auth.token.role == 'platform_admin');
+    }
+    
+    // Clubs management
+    match /clubs/{clubId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.role in ['platform_admin', 'agent', 'club_admin'];
+    }
+    
+    // Invitations
+    match /invitations/{inviteId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.token.role in ['platform_admin', 'agent', 'club_admin', 'seller'];
+      allow update: if request.auth != null && request.auth.token.role == 'platform_admin';
+    }
+    
+    // Subscriptions
+    match /subscriptions/{subId} {
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || request.auth.token.role in ['platform_admin', 'club_admin', 'seller']);
+      allow write: if request.auth != null && request.auth.token.role in ['platform_admin', 'club_admin'];
+    }
+    
+    // Quick invite links
+    match /quick_invite_links/{linkId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.role in ['club_admin', 'seller'];
+    }
+  }
+}

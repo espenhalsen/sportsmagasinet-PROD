@@ -5,7 +5,7 @@
 export const VIPPS_CONFIG = {
   // API URLs
   BASE_URL: process.env.NODE_ENV === 'production' 
-    ? 'https://api.vipps.no' 
+    ? 'https://apitest.vipps.no' 
     : 'https://apitest.vipps.no', // Test environment
   
   // Credentials

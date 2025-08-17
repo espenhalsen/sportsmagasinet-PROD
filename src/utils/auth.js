@@ -1,4 +1,4 @@
-import admin from '@/lib/firebase/admin';
+import { auth } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 
 export async function verifyAuthToken(request) {
@@ -16,7 +16,7 @@ export async function verifyAuthToken(request) {
     }
 
     // Verify the session cookie
-    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie.value, true);
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie.value, true);
     
     console.log('Auth debug - decoded claims:', {
       uid: decodedClaims?.uid,
@@ -28,7 +28,7 @@ export async function verifyAuthToken(request) {
     }
 
     // Get user record to ensure user still exists and get latest claims
-    const userRecord = await admin.auth().getUser(decodedClaims.uid);
+    const userRecord = await auth.getUser(decodedClaims.uid);
     
     console.log('Auth debug - user record:', {
       uid: userRecord.uid,

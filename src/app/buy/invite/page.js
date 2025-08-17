@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Loader2, ExternalLink, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 
-export default function BuyerInvitePage() {
+function BuyerInviteContent() {
   const searchParams = useSearchParams();
   const reservationId = searchParams.get('r');
   
@@ -269,5 +269,22 @@ export default function BuyerInvitePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BuyerInvitePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex items-center justify-center p-8">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-3 text-lg">Laster...</span>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <BuyerInviteContent />
+    </Suspense>
   );
 }

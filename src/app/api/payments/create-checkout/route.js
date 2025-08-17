@@ -1,6 +1,11 @@
+// DISABLED - Not currently in use
+// Causing build errors due to Firebase config issues
+// Uncomment and fix imports when needed
+
+/*
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import admin from '@/lib/firebase/admin';
+import { db, FieldValue } from '@/lib/firebase/admin';
 import { verifyAuthToken } from '@/utils/auth';
 import { getLicensePackageById } from '@/utils/packages';
 
@@ -29,7 +34,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const db = admin.firestore();
+    // db is already imported
 
     // Verify club ownership
     const clubDoc = await db.collection('clubs').doc(clubId).get();
@@ -92,7 +97,7 @@ export async function POST(request) {
     await db.collection('clubs').doc(clubId).update({
       packageStatus: 'pending_payment',
       stripeSessionId: session.id,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
 
     return NextResponse.json({ checkoutUrl: session.url });
@@ -104,4 +109,13 @@ export async function POST(request) {
       { status: 500 }
     );
   }
+}
+*/
+
+// Placeholder function to prevent build errors
+export async function POST(request) {
+  return new Response(JSON.stringify({ error: 'Stripe checkout disabled' }), {
+    status: 501,
+    headers: { 'Content-Type': 'application/json' }
+  });
 }

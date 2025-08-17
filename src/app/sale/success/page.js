@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { CheckCircle, Loader2, AlertCircle, User, Mail, Phone, ArrowRight } from 'lucide-react';
 
-export default function SaleSuccessPage() {
+function SaleSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const saleId = searchParams.get('saleId');
@@ -359,5 +359,27 @@ export default function SaleSuccessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SaleSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardContent className="flex flex-col items-center justify-center p-8">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Laster...
+            </h2>
+            <p className="text-gray-600 text-center">
+              Vennligst vent...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <SaleSuccessContent />
+    </Suspense>
   );
 }

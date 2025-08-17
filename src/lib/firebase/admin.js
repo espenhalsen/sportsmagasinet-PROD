@@ -15,7 +15,7 @@ if (!admin.apps.length) {
   } else {
     // Use service account file (development) 
     try {
-      const serviceAccount = require('../../../sportsmagasinet-database-firebase-adminsdk-fbsvc-ee38bba466.json');
+      const serviceAccount = require('../../../sportsmag-adminfile.json');
       credential = admin.credential.cert(serviceAccount);
     } catch (error) {
       console.error('Failed to load service account file:', error);

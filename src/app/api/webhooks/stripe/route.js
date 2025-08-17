@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+/*import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import admin from '@/lib/firebase/admin';
@@ -269,3 +269,4 @@ async function handlePaymentFailed(invoice, db) {
     }
   }
 }
+*/
